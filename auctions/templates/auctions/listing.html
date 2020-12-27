@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+   {{ listing.title }}
+{% endblock %}
+
+{% block body %}
+   <div>
+      <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+      <div>
+         <h1>{{ listing.title }}</h1>
+         <h4>Starting Bid: {{ listing.starting_bid }} SEK</h4>
+         {% if listing.current_bid is not listing.starting_bid %}
+         <h4>Current Bid: {{ listing.current_bid }} SEK </h4>
+         {% endif %}
+         <p>Seller: {{ seller }}</p>
+      </div>
+      <div>
+         <form action="{% url 'watchListing' %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="{% if form.is_watched.value %}Unw{% else %}W{% endif %}atch">
+         </form>
+      </div>
+   </div>
+   <div>
+      {{ listing.description }}
+   </div>
+{% endblock %}

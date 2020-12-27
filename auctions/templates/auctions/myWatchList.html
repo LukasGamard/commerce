@@ -1,10 +1,15 @@
 {% extends "auctions/layout.html" %}
 
-{% block body %}
-   <h2>Active Listings</h2>
+{% block title%}
+   My Watchlist
+{% endblock %}
 
+{% block body %}
+   <h2>Watched Listings</h2>
+
+   <p>{{watchlist}}</p>
    <ul>
-      {% for listing in listings %}
+      {% for listing in watchlist %}
          <li value="{{ listing.id }}">
             <a class="listing-link" href="auction/{{ listing.id }}">
                <div class="listing-wrapper">
@@ -23,5 +28,4 @@
          <li>No Listings</li>
       {% endfor %}
    </ul>
-
 {% endblock %}
