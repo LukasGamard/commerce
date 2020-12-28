@@ -18,8 +18,13 @@
       <div>
          <form action="{% url 'watchListing' %}" method="post">
             {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="{% if form.is_watched.value %}Unw{% else %}W{% endif %}atch">
+            {{ watchform }}
+            <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
+         </form>
+         <form action="{% url 'bid' %}" method="post">
+            {% csrf_token %}
+            {{ bidform }}
+            <input type="submit" value="Bid">
          </form>
       </div>
    </div>

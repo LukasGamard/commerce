@@ -1,3 +1,6 @@
+'''
+paths for the application
+'''
 from django.urls import path
 
 from . import views
@@ -10,5 +13,6 @@ urlpatterns = [
     path("newListing", views.newListing, name="newListing"),
     path("auction/<str:listing_id>", views.getListing, name="listing"),
     path("watchListing", views.watchListing, name="watchListing"),
-    path("myWatchList", views.myWatchList, name="myWatchList")
+    path("myWatchList", views.myWatchList, name="myWatchList"),
+    path("bid", views.bid, name="bid")
 ]

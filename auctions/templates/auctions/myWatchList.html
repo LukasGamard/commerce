@@ -7,7 +7,6 @@
 {% block body %}
    <h2>Watched Listings</h2>
 
-   <p>{{watchlist}}</p>
    <ul>
       {% for listing in watchlist %}
          <li value="{{ listing.id }}">
