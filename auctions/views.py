@@ -8,7 +8,7 @@ from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
-from .models import User, Listing, Bid
+from .models import User, Listing, Bid, Comment
 
 class NewListingForm(forms.Form):
     title = forms.CharField(label="Title")
@@ -48,6 +48,23 @@ class BidForm(forms.ModelForm):
                 raise ValidationError(
                     "Your bid must be higher than the current bid."
                 )
+
+class CloseBidForm(forms.Form):
+    listing = forms.CharField(label="listing", required=True)
+
+class NewCommentForm(forms.ModelForm):
+    '''
+    comment on a listing
+    '''
+    class Meta:
+        model = Comment
+        fields = "__all__"
+        widgets = {
+            "listing": forms.HiddenInput,
+            "author": forms.HiddenInput,
+            "datetime": forms.HiddenInput,
+            "content": forms.Textarea,
+        }
 
 def index(request):
     listings = Listing.objects.all()
@@ -95,12 +112,15 @@ def getListing(request, listing_id):
         "user": request.user,
         "listing": listing
     })
+    commentform = NewCommentForm()
 
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "seller": User.objects.get(pk=listing.seller.id),
         "watchform": watchform,
-        "bidform": bidform
+        "bidform": bidform,
+        "commentform": commentform,
+        "comments": Comment.objects.filter(listing=listing)
     })
 
 @login_required
@@ -156,6 +176,32 @@ def myWatchList(request):
     return render(request, "auctions/myWatchList.html", {
         "watchlist": watchlist
     })
+
+@login_required
+def closeBid(request):
+    if request.method == "POST":
+        form = CloseBidForm(request.POST)
+        
+        if form.is_valid():
+            listing = Listing.objects.get(title=form.cleaned_data["listing"])
+            if request.user == listing.seller:
+                listing.active = False
+                listing.save()
+ 
+        return getListing(request, listing.id)
+
+@login_required
+def newComment(request):
+    if request.method == "POST":
+        form = NewCommentForm(request.POST)
+        form.data["datetime"] = timezone.now()
+        form.data["author"] = request.user
+
+        if form.is_valid():
+            form.save()
+            listing = Listing.objects.get(title=form.cleaned_data["listing"])
+            return getListing(request, listing.id)
+
 
 
 def login_view(request):

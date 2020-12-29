@@ -15,20 +15,60 @@
          {% endif %}
          <p>Seller: {{ seller }}</p>
       </div>
+      {% if listing.active %}
       <div>
-         <form action="{% url 'watchListing' %}" method="post">
-            {% csrf_token %}
-            {{ watchform }}
-            <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
-         </form>
-         <form action="{% url 'bid' %}" method="post">
-            {% csrf_token %}
-            {{ bidform }}
-            <input type="submit" value="Bid">
-         </form>
+         {% if request.user != seller %}
+            <form action="{% url 'watchListing' %}" method="post">
+               {% csrf_token %}
+               {{ watchform }}
+               <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
+            </form>
+            <form action="{% url 'bid' %}" method="post">
+               {% csrf_token %}
+               {{ bidform }}
+               <input type="submit" value="Bid">
+            </form>
+         {% else %}
+            <form action="{% url 'closeBid' %}" method="post">
+               {% csrf_token %}
+               <input type="hidden" name="listing" value="{{ listing }}">
+               <input type="submit" value="Close the Bid">
+            </form>
+         {% endif %}
       </div>
+      {% else %}
+      <div>
+         <h4>Listing is Closed</h4>
+         {% if request.user == listing.highest_bidder %}
+         <p>Congratulations, you won the auction!</p>
+         {% endif %}
+      </div>
+      {% endif %}
    </div>
    <div>
       {{ listing.description }}
+   </div>
+   <div>
+      <h4>Comments</h4>
+      <ul>
+         {% for comment in listing.comments %}
+            <li>
+               <div class="comment">
+                  <h6>{{ comment.author }} <span class="comment-time">{{ comment.datetime }}</span></h6>
+                  <p>{{ comment.content }}</p>
+               </div>      
+            </li>
+         {% empty %}
+            <li>No Comments.</li>
+         {% endfor %}
+      </ul>
+      <div>
+         <h4>Add a Comment:</h4>
+         <form action="newComment" method="post">
+            {% csrf_token %}
+            {{ commentform }}
+            <input type="submit" value="Submit">
+         </form>
+      </div>
    </div>
 {% endblock %}
