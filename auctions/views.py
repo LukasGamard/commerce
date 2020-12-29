@@ -112,7 +112,10 @@ def getListing(request, listing_id):
         "user": request.user,
         "listing": listing
     })
-    commentform = NewCommentForm()
+    commentform = NewCommentForm({
+        "author": request.user,
+        "listing": listing
+    })
 
     return render(request, "auctions/listing.html", {
         "listing": listing,
@@ -193,14 +196,18 @@ def closeBid(request):
 @login_required
 def newComment(request):
     if request.method == "POST":
+        request.POST._mutable = True
+        request.POST["datetime"] = timezone.now()
+        request.POST["author"] = request.user
         form = NewCommentForm(request.POST)
-        form.data["datetime"] = timezone.now()
-        form.data["author"] = request.user
 
         if form.is_valid():
             form.save()
             listing = Listing.objects.get(title=form.cleaned_data["listing"])
+            print(f"listing.id: {listing.id}")
             return getListing(request, listing.id)
+        
+        print("invalid form", form)
 
 
 

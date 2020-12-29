@@ -51,7 +51,7 @@
    <div>
       <h4>Comments</h4>
       <ul>
-         {% for comment in listing.comments %}
+         {% for comment in comments reversed %}
             <li>
                <div class="comment">
                   <h6>{{ comment.author }} <span class="comment-time">{{ comment.datetime }}</span></h6>
@@ -64,9 +64,10 @@
       </ul>
       <div>
          <h4>Add a Comment:</h4>
-         <form action="newComment" method="post">
+         <form action="{% url 'newComment' %}" method="post">
             {% csrf_token %}
-            {{ commentform }}
+            {{ commentform.content }}
+            {{ commentform.listing }}
             <input type="submit" value="Submit">
          </form>
       </div>

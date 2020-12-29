@@ -70,15 +70,3 @@ class Bid(models.Model):
         'Listing',
         on_delete=models.CASCADE,
     )
-
-class Comment(models.Model):
-    text = models.CharField(max_length=300)
-    created = models.DateTimeField()
-    listing = models.ForeignKey(
-        'Listing',
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-    )
