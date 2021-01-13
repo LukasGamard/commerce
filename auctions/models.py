@@ -38,7 +38,7 @@ class Listing(models.Model):
     category = models.CharField(
         max_length=2,
         choices=Category.choices,
-        null=True,
+        default=Category.OTHERS,
     )
     created = models.DateTimeField()
     seller = models.ForeignKey(
@@ -58,7 +58,7 @@ class Listing(models.Model):
         return f"{self.title}"
 
 class User(AbstractUser):
-    watchlist = models.ManyToManyField(Listing)
+    watchlist = models.ManyToManyField(Listing, null=True)
 
 class Bid(models.Model):
     amount = models.FloatField()

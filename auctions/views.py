@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -10,12 +11,15 @@ from django.core.exceptions import ValidationError
 
 from .models import User, Listing, Bid, Comment
 
-class NewListingForm(forms.Form):
-    title = forms.CharField(label="Title")
-    description = forms.CharField(label="Description")
-    starting_bid = forms.FloatField(label="Starting bid")
-    imageURL = forms.URLField(label="Image URL", required=False)
-    category = forms.CharField(label="Category", required=False)
+class NewListingForm(forms.ModelForm):
+
+    class Meta:
+        model = Listing
+        exclude = ["current_bid", "created", "seller", "highest_bidder", "active"]
+        widgets = {
+            "category": forms.Select,
+            "description": forms.Textarea,
+        }
 
 class WatchForm(forms.Form):
     listing_id = forms.IntegerField(widget=forms.HiddenInput ,label="listing_id")
@@ -75,23 +79,16 @@ def index(request):
 @login_required
 def newListing(request):
     if request.method == "POST":
+        request.POST._mutable = True
+        request.POST["created"] = timezone.now()
+        request.POST["seller"] = request.user
         form = NewListingForm(request.POST)
 
         if form.is_valid():
-            listing = Listing(
-                title=form.cleaned_data["title"],
-                description=form.cleaned_data["description"],
-                starting_bid=form.cleaned_data["starting_bid"],
-                current_bid=form.cleaned_data["starting_bid"],
-                imageURL=form.cleaned_data["imageURL"],
-                category=form.cleaned_data["category"],
-                created=timezone.now(),
-                seller=User.objects.get(pk=request.user.id)
-            )
-            listing.save()
+            form.save()
         else:
             print("invalid form")
-      
+
         return HttpResponseRedirect(reverse("index"))
 
 
@@ -104,26 +101,46 @@ def getListing(request, listing_id):
     listing = Listing.objects.get(pk=listing_id)
     ## check if the listing is being watched
 
-    watchform = WatchForm({
-        "listing_id": listing.id,
-        "is_watched": listing in request.user.watchlist.all()
-    })
-    bidform = BidForm({
-        "user": request.user,
-        "listing": listing
-    })
-    commentform = NewCommentForm({
-        "author": request.user,
-        "listing": listing
-    })
+    if request.user.is_authenticated:
+        watchform = WatchForm({
+            "listing_id": listing.id,
+            "is_watched": listing in request.user.watchlist.all()
+        })
+        bidform = BidForm({
+            "user": request.user,
+            "listing": listing
+        })
+        commentform = NewCommentForm({
+            "author": request.user,
+            "listing": listing
+        })
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "seller": User.objects.get(pk=listing.seller.id),
+            "watchform": watchform,
+            "bidform": bidform,
+            "commentform": commentform,
+            "comments": Comment.objects.filter(listing=listing)
+        })
 
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "seller": User.objects.get(pk=listing.seller.id),
-        "watchform": watchform,
-        "bidform": bidform,
-        "commentform": commentform,
         "comments": Comment.objects.filter(listing=listing)
+    })
+
+def category(request, category_name=None):
+    if category_name:
+        # display the list of all listings in that category
+        listings = Listing.objects.filter(category=category_name)
+        return render(request, "auctions/category.html", {
+            "category": category_name,
+            "listings": listings
+        })
+    # display the list of all categories
+    categories = [value.label for name, value in vars(Listing.Category).items() if name.isupper()]
+    return render(request, "auctions/category.html", {
+        "categories": categories
     })
 
 @login_required
@@ -204,7 +221,6 @@ def newComment(request):
         if form.is_valid():
             form.save()
             listing = Listing.objects.get(title=form.cleaned_data["listing"])
-            print(f"listing.id: {listing.id}")
             return getListing(request, listing.id)
         
         print("invalid form", form)

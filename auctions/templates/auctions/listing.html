@@ -6,45 +6,52 @@
 
 {% block body %}
    <div>
-      <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+      {% if listing.imageURL %}
+         <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+      {% endif %}
       <div>
-         <h1>{{ listing.title }}</h1>
+         <div>
+            <h1>{{ listing.title }}</h1>
+            <a class="category" href="../category/{{ listing.category }}">{{ listing.category }}</a>
+         </div>
          <h4>Starting Bid: {{ listing.starting_bid }} SEK</h4>
-         {% if listing.current_bid is not listing.starting_bid %}
+         {% if listing.current_bid %}
          <h4>Current Bid: {{ listing.current_bid }} SEK </h4>
          {% endif %}
          <p>Seller: {{ seller }}</p>
+   {% if request.user.is_authenticated %}
       </div>
-      {% if listing.active %}
-      <div>
-         {% if request.user != seller %}
-            <form action="{% url 'watchListing' %}" method="post">
-               {% csrf_token %}
-               {{ watchform }}
-               <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
-            </form>
-            <form action="{% url 'bid' %}" method="post">
-               {% csrf_token %}
-               {{ bidform }}
-               <input type="submit" value="Bid">
-            </form>
+         {% if listing.active %}
+         <div>
+            {% if request.user != seller %}
+               <form action="{% url 'watchListing' %}" method="post">
+                  {% csrf_token %}
+                  {{ watchform }}
+                  <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
+               </form>
+               <form action="{% url 'bid' %}" method="post">
+                  {% csrf_token %}
+                  {{ bidform }}
+                  <input type="submit" value="Bid">
+               </form>
+            {% else %}
+               <form action="{% url 'closeBid' %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="listing" value="{{ listing }}">
+                  <input type="submit" value="Close the Bid">
+               </form>
+            {% endif %}
+         </div>
          {% else %}
-            <form action="{% url 'closeBid' %}" method="post">
-               {% csrf_token %}
-               <input type="hidden" name="listing" value="{{ listing }}">
-               <input type="submit" value="Close the Bid">
-            </form>
+         <div>
+            <h4>Listing is Closed</h4>
+            {% if request.user == listing.highest_bidder %}
+            <p>Congratulations, you won the auction!</p>
+            {% endif %}
+         </div>
          {% endif %}
       </div>
-      {% else %}
-      <div>
-         <h4>Listing is Closed</h4>
-         {% if request.user == listing.highest_bidder %}
-         <p>Congratulations, you won the auction!</p>
-         {% endif %}
-      </div>
-      {% endif %}
-   </div>
+   {% endif %}
    <div>
       {{ listing.description }}
    </div>
@@ -62,14 +69,16 @@
             <li>No Comments.</li>
          {% endfor %}
       </ul>
-      <div>
-         <h4>Add a Comment:</h4>
-         <form action="{% url 'newComment' %}" method="post">
-            {% csrf_token %}
-            {{ commentform.content }}
-            {{ commentform.listing }}
-            <input type="submit" value="Submit">
-         </form>
-      </div>
+      {% if request.user.is_authenticated %}
+         <div>
+            <h4>Add a Comment:</h4>
+            <form action="{% url 'newComment' %}" method="post">
+               {% csrf_token %}
+               {{ commentform.content }}
+               {{ commentform.listing }}
+               <input type="submit" value="Submit">
+            </form>
+         </div>
+      {% endif %}
    </div>
 {% endblock %}

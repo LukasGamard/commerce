@@ -1,6 +1,7 @@
 '''
 paths for the application
 '''
+from django.contrib import admin
 from django.urls import path
 
 from . import views
@@ -12,6 +13,8 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("newListing", views.newListing, name="newListing"),
     path("auction/<str:listing_id>", views.getListing, name="listing"),
+    path("category", views.category, name="categories"),
+    path("category/<str:category_name>", views.category, name="category"),
     path("watchListing", views.watchListing, name="watchListing"),
     path("myWatchList", views.myWatchList, name="myWatchList"),
     path("bid", views.bid, name="bid"),

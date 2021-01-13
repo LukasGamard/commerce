@@ -1,11 +1,15 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+   Auctions
+{% endblock %}
+
 {% block body %}
    <h2>Active Listings</h2>
 
    <ul>
       {% for listing in listings %}
-         <li value="{{ listing.id }}">
+            <li value="{{ listing.id }}">
             <a class="listing-link" href="auction/{{ listing.id }}">
                <div class="listing-wrapper">
                   {% if listing.imageURL %}
