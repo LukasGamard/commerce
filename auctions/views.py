@@ -1,3 +1,4 @@
+import logging
 from django.contrib import admin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -11,11 +12,19 @@ from django.core.exceptions import ValidationError
 
 from .models import User, Listing, Bid, Comment
 
-class NewListingForm(forms.ModelForm):
+class LoggingMixin(object):
+    def add_error(self, field, error):
+        if field:
+            logging.warning(f"Form error on field {field}: {error}")
+        else:
+            logging.warning(f"Form error: {error}")
+        super(LoggingMixin, self).add_error(field, error)
+
+class NewListingForm(LoggingMixin, forms.ModelForm):
 
     class Meta:
         model = Listing
-        exclude = ["current_bid", "created", "seller", "highest_bidder", "active"]
+        fields = "__all__"
         widgets = {
             "category": forms.Select,
             "description": forms.Textarea,
@@ -68,12 +77,13 @@ class NewCommentForm(forms.ModelForm):
             "author": forms.HiddenInput,
             "datetime": forms.HiddenInput,
             "content": forms.Textarea,
+            "starting_bid": forms.NumberInput(attrs={"class": "form-control"})
         }
 
 def index(request):
     listings = Listing.objects.all()
     return render(request, "auctions/index.html", {
-        "listings": listings
+        "listings": listings,
     })
 
 @login_required
@@ -125,6 +135,7 @@ def getListing(request, listing_id):
 
     return render(request, "auctions/listing.html", {
         "listing": listing,
+        "category": listing.category,
         "seller": User.objects.get(pk=listing.seller.id),
         "comments": Comment.objects.filter(listing=listing)
     })
@@ -223,10 +234,6 @@ def newComment(request):
             listing = Listing.objects.get(title=form.cleaned_data["listing"])
             return getListing(request, listing.id)
         
-        print("invalid form", form)
-
-
-
 def login_view(request):
     if request.method == "POST":
 

@@ -5,61 +5,82 @@
 {% endblock %}
 
 {% block body %}
-   <div>
+   <div id="listing-full">
       {% if listing.imageURL %}
-         <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+         <img src="{{ listing.imageURL }}" alt="{{ listing.title }}" id="listing-img">
       {% endif %}
-      <div>
-         <div>
-            <h1>{{ listing.title }}</h1>
-            <a class="category" href="../category/{{ listing.category }}">{{ listing.category }}</a>
+      <div id="listing-main">
+         <div id="listing-hero">
+            <div id="hero-title">
+               <h1>{{ listing.title }}</h1>
+               <a class="link1" href="../category/{{ category }}">{{ listing.category }}</a>
+            </div>
+            {% if request.user.is_authenticated and listing.active %}
+               <form action="{% url 'watchListing' %}" method="post">
+                  {% csrf_token %}
+                  {{ watchform }}
+                  <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch" class="btn btn-light border-btn">
+               </form>
+            {% endif %}
          </div>
+
          <h4>Starting Bid: {{ listing.starting_bid }} SEK</h4>
          {% if listing.current_bid %}
          <h4>Current Bid: {{ listing.current_bid }} SEK </h4>
          {% endif %}
          <p>Seller: {{ seller }}</p>
-   {% if request.user.is_authenticated %}
-      </div>
-         {% if listing.active %}
-         <div>
-            {% if request.user != seller %}
-               <form action="{% url 'watchListing' %}" method="post">
-                  {% csrf_token %}
-                  {{ watchform }}
-                  <input type="submit" value="{% if watchform.is_watched.value %}Unw{% else %}W{% endif %}atch">
-               </form>
-               <form action="{% url 'bid' %}" method="post">
-                  {% csrf_token %}
-                  {{ bidform }}
-                  <input type="submit" value="Bid">
-               </form>
-            {% else %}
-               <form action="{% url 'closeBid' %}" method="post">
-                  {% csrf_token %}
-                  <input type="hidden" name="listing" value="{{ listing }}">
-                  <input type="submit" value="Close the Bid">
-               </form>
+         {% if request.user.is_authenticated %}
+            {% if listing.active %}
+               <div class="mb-3">
+                  {% if request.user != seller %}
+                     <form action="{% url 'bid' %}" method="post">
+                        {% csrf_token %}
+                        {{ bidform.amount.label_tag }}
+                        {{ bidform.amount }}
+                        <input type="submit" value="Bid" class="btn btn-light border-btn">
+                     </form>
+                  {% else %}
+                     <form action="{% url 'closeBid' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing" value="{{ listing }}">
+                        <input type="submit" value="Close the Bid">
+                     </form>
+                  {% endif %}
+               </div>
+               {% else %}
+               <div class="mb-3">
+                  <h4 class="alert alert-warning" role="alert">Listing is Closed</h4>
+                  {% if request.user == listing.highest_bidder %}
+                  <p class="alert alert-success" role="alert">Congratulations, you won the auction!</p>
+                  {% endif %}
+               </div>
             {% endif %}
-         </div>
-         {% else %}
-         <div>
-            <h4>Listing is Closed</h4>
-            {% if request.user == listing.highest_bidder %}
-            <p>Congratulations, you won the auction!</p>
-            {% endif %}
-         </div>
          {% endif %}
+      <div>
+      
+      <div class="mb-3" id="description">
+         <h4>Description</h4>
+         {{ listing.description }}
       </div>
-   {% endif %}
-   <div>
-      {{ listing.description }}
    </div>
-   <div>
+
+   <div class="mb-3">
+      {% if request.user.is_authenticated %}
+         <div class="mb-2">
+            <h4>Add a Comment:</h4>
+            <form action="{% url 'newComment' %}" method="post" class="field-wrapper">
+               {% csrf_token %}
+               {{ commentform.content }}
+               {{ commentform.listing }}
+               <input type="submit" value="Submit" class="btn btn-light border-btn" id="submit">
+            </form>
+         </div>
+      {% endif %}
+
       <h4>Comments</h4>
       <ul>
          {% for comment in comments reversed %}
-            <li>
+            <li class="mb-2">
                <div class="comment">
                   <h6>{{ comment.author }} <span class="comment-time">{{ comment.datetime }}</span></h6>
                   <p>{{ comment.content }}</p>
@@ -69,16 +90,5 @@
             <li>No Comments.</li>
          {% endfor %}
       </ul>
-      {% if request.user.is_authenticated %}
-         <div>
-            <h4>Add a Comment:</h4>
-            <form action="{% url 'newComment' %}" method="post">
-               {% csrf_token %}
-               {{ commentform.content }}
-               {{ commentform.listing }}
-               <input type="submit" value="Submit">
-            </form>
-         </div>
-      {% endif %}
    </div>
 {% endblock %}

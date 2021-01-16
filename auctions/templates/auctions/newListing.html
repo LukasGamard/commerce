@@ -5,28 +5,33 @@
 {% endblock %}
 
 {% block body %}
-   <form action="{% url 'newListing' %}" method="post">
-      {% csrf_token %}
-      <div class="field_wrapper">
-         {{ form.title.label_tag }}
-         {{ form.title }}
-      </div>
-      <div class="field_wrapper">
-         {{ form.category.label_tag}}
-         {{ form.category }}
-      </div>
-      <div class="field_wrapper">
-         {{ form.description.label_tag}}
-         {{ form.description }}
-      </div>
-      <div class="fiedl_wrapper">
-         {{ form.starting_bid.label_tag }}
-         {{ form.starting_bid }}
-      </div>
-      <div class="field_wrapper">
-         {{ form.imageURL.label_tag }}
-         {{ form.imageURL }}
-      </div>
-      <input type="submit" value="Create">
-   </form>
+   <div class="form-wrapper">
+      <form action="{% url 'newListing' %}" method="post">
+         {% csrf_token %}
+         <div class="field-wrapper">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+         </div>
+         <div class="field-wrapper">
+            {{ form.category.label_tag}}
+            {{ form.category }}
+         </div>
+         <div class="field-wrapper">
+            {{ form.description.label_tag}}
+            {{ form.description }}
+         </div>
+         <div class="field-wrapper">
+            {{ form.starting_bid.label_tag }}
+            <div class="input-group">
+               <span class="input-group-text">SEK</span>
+               {{ form.starting_bid }}
+            </div>
+         </div>
+         <div class="field-wrapper">
+            <label for="{{ form.imageURL.id_for_label }}">URL for your Image</label>
+            {{ form.imageURL }}
+         </div>
+         <input type="submit" value="Create" class="btn btn-primary mt-3">
+      </form>
+   </div>
 {% endblock %}

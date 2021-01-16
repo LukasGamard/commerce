@@ -8,42 +8,61 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <h1>Auctions</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a href="/" class="navbar-brand">Auctions</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
+                    <ul class="navbar-nav mb-lg-10">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'categories' %}" class="nav-link">Categories</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                            <a class="nav-link nav-item" href="{% url 'myWatchList' %}">My Watchlist</a>
+                            </li>
+                            <li class="nav-item">
+                            <a class="nav-link btn btn-primary" href="{% url 'newListing' %}" id="new-listing"><img src="../../static/auctions/images/plus-logo.png" alt="+" id="plus-logo"> Create New Listing</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <div class="dropdown ms-auto flex-grow-1 d-flex align-items-end flex-column">
+                        <a href="#" class="link1 dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                                Signed in as <strong>{{ user.username }}</strong>.
+                            {% else %}
+                                Not signed in.
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            {% if request.user.is_authenticated %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
+                                </li>
+                            {% else %}
+                               <li>
+                                    <a class="dropdown-item" href="{% url 'login' %}">Log In</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'register' %}">Register</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+
+        <div id="body-container">
+            {% block body %}
+            {% endblock %}
         </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'categories' %}" class="nav-link">Categories</a>
-            </li>
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                   <a class="nav-link" href="{% url 'myWatchList' %}">My Watchlist</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link" href="{% url 'newListing' %}" class="nav-item">Create New Listing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
-        <hr>
-        {% block body %}
-        {% endblock %}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
     </body>
 </html>

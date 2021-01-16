@@ -7,6 +7,10 @@ body {
     padding: 10px;
 }
 
+ul {
+   list-style: none;
+}
+
 .listing-wrapper {
    width: 90vw;
    height: 200px;
@@ -14,7 +18,7 @@ body {
    border-radius: 5px;
    display: flex;
    flex-direction: row;
-   padding: 5px;
+   padding: 5px 10px;
    margin-top: 10px;
 }
 
@@ -24,6 +28,7 @@ body {
 }
 .listing-img {
    height: 100%;
+   margin: 0 20px;
 }
 
 .listing-link {
@@ -33,4 +38,112 @@ body {
 .listing-link:hover {
    color: black;
    text-decoration: none;
+}
+
+.link1 {
+   color: black;
+}
+
+.link1:hover {
+   text-decoration: none;
+   color: #555555;
+}
+
+.field-wrapper {
+   display: flex;
+   flex-direction: column;
+   margin-top: 10px;
+}
+
+.form-wrapper {
+   width: 60%;
+   max-width: 600px;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   margin: auto;
+}
+
+.border-btn {
+   border: 1px solid #cccccc;
+   border-radius: .25rem;
+}
+
+#listing-full {
+   width: 70%;
+   max-width: 700px;
+   margin: auto;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+#listing-img {
+   margin-bottom: 20px;
+   margin-top: 20px;
+   max-width: 400px;
+   max-height: 400px;
+}
+
+#listing-main {
+   width: 100%;
+}
+
+#listing-hero {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 20px;
+}
+
+#hero-title {
+   display: flex;
+   flex-direction: column;
+}
+
+.comment {
+   border: 1px solid gray;
+   border-radius: 5px;
+   padding: 20px 10px;
+   margin-bottom: 10px;
+}
+
+.comment-time {
+   color: #666666;
+}
+
+.credentials {
+   width: 30%;
+   margin: auto;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+.credentials-form {
+   width: 100%;
+}
+
+#body-container {
+   list-style: none;
+   margin: 20px 40px;
+   display: flex;
+   justify-content: center;
+   flex-direction: column;
+}
+
+#new-listing {
+   color: #ffffff;
+   margin-left: 20px;
+}
+
+#plus-logo {
+   width: 25px;
+   height: 25px;
+}
+
+#submit {
+   width: fit-content;
+   margin-top: 10px;
 }

@@ -33,7 +33,7 @@ class Listing(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=300)
     starting_bid = models.FloatField()
-    current_bid = models.FloatField(null=True)
+    current_bid = models.FloatField(null=True, blank=True)
     imageURL = models.URLField(null=True)
     category = models.CharField(
         max_length=2,
@@ -51,6 +51,7 @@ class Listing(models.Model):
         on_delete=models.CASCADE,
         related_name="highest_bid",
         null=True,
+        blank=True,
     )
     active = models.BooleanField(default=True)
 
@@ -58,7 +59,7 @@ class Listing(models.Model):
         return f"{self.title}"
 
 class User(AbstractUser):
-    watchlist = models.ManyToManyField(Listing, null=True)
+    watchlist = models.ManyToManyField(Listing, default=None, blank=True)
 
 class Bid(models.Model):
     amount = models.FloatField()
